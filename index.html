@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Image Upload with Auth</title>
+  </head>
+  <body>
+    <h1>Upload Image</h1>
+    <form id="uploadForm">
+      <input
+        type="file"
+        id="imageInput"
+        name="image"
+        accept="image/*"
+        required
+      />
+      <button type="submit">Upload</button>
+    </form>
+
+    <h2>Uploaded Image:</h2>
+    <img
+      id="uploadedImage"
+      src=""
+      alt="Uploaded image will appear here"
+      style="max-width: 300px"
+    />
+
+    <script>
+      const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwidXNlcm5hbWUiOiJoYW5hIiwiaWF0IjoxNzM3OTg0NzU1LCJleHAiOjE3Mzc5ODgzNTV9.BQIIAzTxPkDIlpnVXjcdInKwA-a8v6Y96rikIzz9zQA"; // Replace with the JWT token from login
+
+      const form = document.getElementById("uploadForm");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        const formData = new FormData();
+        const fileInput = document.getElementById("imageInput");
+        formData.append("image", fileInput.files[0]);
+
+        try {
+          const response = await fetch("http://localhost:3000/upload-image", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+            body: formData,
+          });
+
+          const result = await response.json();
+          if (response.ok) {
+            const uploadedImage = document.getElementById("uploadedImage");
+            uploadedImage.src = result.imageUrl;
+          } else {
+            alert("Image upload failed: " + result.error);
+          }
+        } catch (error) {
+          console.error(error);
+          alert("An error occurred during upload.");
+        }
+      });
+    </script>
+  </body>
+</html>
